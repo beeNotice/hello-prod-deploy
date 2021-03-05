@@ -1,0 +1,77 @@
+== Tools
+
+* Git
+* Visual Studio Code (facultatif)
+	** Terraform Visual Studio Code Extension
+	** AsciiDoc support for Visual Studio Code
+
+== Azure
+
+* https://docs.microsoft.com/fr-fr/cli/azure/install-azure-cli-windows?tabs=azure-cli
+* https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/guides/azure_cli
+
+Perform installation _(requires Administrator rights)_
+
+== Deployment initialisation
+
+=== Create a Service Principal for GitHub deployment
+
+* https://docs.microsoft.com/fr-fr/cli/azure/create-an-azure-service-principal-azure-cli
+
+[source,cmd]
+----
+# Select the appropriate subscription
+az ad sp create-for-rbac --name "GitHub" --role contributor --sdk-auth
+----
+
+WARN: By default, az ad sp create-for-rbac assigns the Contributor role to the service principal at the subscription scope.
+
+WARN: Account is valid for one year, so add an update to your calendar ;)
+
+== Terraform
+
+=== Installation
+
+* https://www.terraform.io/downloads.html
+* Unzip & Add to path
+	** Edit environemnt variables for your account
+	** Add to "Path"
+* Check by typing terraform in a Powershell console
+
+=== Usage
+
+[source,cmd]
+----
+az login
+
+terraform init
+terraform workspace new poc
+terraform workspace select poc
+
+terraform plan
+terraform apply
+
+terraform plan -destroy
+terraform destroy
+
+terraform fmt -recursive
+----
+
+NOTE: You can specify a specific config file using `terraform plan -var-file="./configuration/wps.poc.tfvars"`
+
+== Annexes
+
+=== Ressources
+
+* https://github.com/terraform-providers/terraform-provider-azurerm/tree/master/examples
+
+=== Azure data
+
+[source,cmd]
+----
+# List locations
+az account list-locations -o table
+
+# List App Services runtimes
+az webapp list-runtimes --linux
+----
