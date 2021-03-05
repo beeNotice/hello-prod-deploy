@@ -1,3 +1,13 @@
+= Hello Prod
+:docinfo1:
+:hardbreaks:
+:sectanchors:
+:sectnums:
+:icons: font
+:toc: left
+:toc-title: Sommaire
+:description: Hello Prod
+
 == Tools
 
 * Git
@@ -24,9 +34,9 @@ Perform installation _(requires Administrator rights)_
 az ad sp create-for-rbac --name "GitHub" --role contributor --sdk-auth
 ----
 
-WARN: By default, az ad sp create-for-rbac assigns the Contributor role to the service principal at the subscription scope.
+WARNING: By default, az ad sp create-for-rbac assigns the Contributor role to the service principal at the subscription scope.
 
-WARN: Account is valid for one year, so add an update to your calendar ;)
+WARNING: Account is valid for one year, so add an update to your calendar ;)
 
 == Terraform
 
@@ -59,7 +69,16 @@ terraform fmt -recursive
 
 NOTE: You can specify a specific config file using `terraform plan -var-file="./configuration/wps.poc.tfvars"`
 
+=== Deployment manual
+
+* Instance count on App Services : https://github.com/terraform-providers/terraform-provider-azurerm/issues/7502
+* Load balancing delay on App Service Health Check
+
 == Annexes
+
+=== Sizing
+
+* Sur la plan App Service doit être au moins en Standard pour avoir accès au déploiement continu
 
 === Ressources
 

@@ -17,6 +17,15 @@ resource "azurerm_resource_group" "main" {
   location = var.location
 }
 
+# Create Hello Application Insights
+resource "azurerm_application_insights" "hello" {
+  name                = "appinsights-${var.prefix}-athena-${var.env}"
+  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
+
+  application_type = "java"
+}
+
 # Create the App Service plan
 resource "azurerm_app_service_plan" "main" {
   name                = "azapp-${var.prefix}-plan-${var.env}"
@@ -46,7 +55,38 @@ resource "azurerm_app_service" "app" {
   site_config {
     linux_fx_version = "JAVA|11-java11"
     # Avoid startup time since it's available in our tier
-    always_on        = true
-    http2_enabled    = true
+    always_on         = true
+    http2_enabled     = true
+    health_check_path = "/actuator/health"
+  }
+
+  logs {
+    http_logs {
+      file_system {
+        retention_in_mb   = 100 # in Megabytes
+        retention_in_days = 7   # in days
+      }
+    }
+  }
+
+  app_settings = {
+
+    "WEBSITES_ENABLE_APP_SERVICE_STORAGE" = "false"
+
+    "SPRING_PROFILES_ACTIVE" = "prod"
+
+    # App Insights 
+    # https://docs.microsoft.com/en-us/azure/azure-monitor/app/azure-web-apps?tabs=net#automate-monitoring
+    "APPINSIGHTS_INSTRUMENTATIONKEY"                  = azurerm_application_insights.hello.instrumentation_key
+    "APPLICATIONINSIGHTS_CONNECTION_STRING"           = azurerm_application_insights.hello.connection_string
+    "APPINSIGHTS_PROFILERFEATURE_VERSION"             = "1.0.0"
+    "APPINSIGHTS_SNAPSHOTFEATURE_VERSION"             = "1.0.0"
+    "ApplicationInsightsAgent_EXTENSION_VERSION"      = "~3"
+    "DiagnosticServices_EXTENSION_VERSION"            = "~3"
+    "InstrumentationEngine_EXTENSION_VERSION"         = "disabled"
+    "SnapshotDebugger_EXTENSION_VERSION"              = "disabled"
+    "XDT_MicrosoftApplicationInsights_BaseExtensions" = "disabled"
+    "XDT_MicrosoftApplicationInsights_Mode"           = "recommended"
+    "XDT_MicrosoftApplicationInsights_PreemptSdk"     = "disabled"
   }
 }
