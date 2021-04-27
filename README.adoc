@@ -8,19 +8,18 @@
 :toc-title: Sommaire
 :description: Hello Prod
 
-== Tools
-
-* Git
-* Visual Studio Code (facultatif)
-	** Terraform Visual Studio Code Extension
-	** AsciiDoc support for Visual Studio Code
-
-== Azure
+== Azure cli
 
 * https://docs.microsoft.com/fr-fr/cli/azure/install-azure-cli-windows?tabs=azure-cli
 * https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/guides/azure_cli
 
 Perform installation _(requires Administrator rights)_
+
+[source,cmd]
+.kubectl
+----
+az aks install-cli
+----
 
 == Deployment initialisation
 
@@ -38,6 +37,8 @@ WARNING: By default, az ad sp create-for-rbac assigns the Contributor role to th
 
 WARNING: Account is valid for one year, so add an update to your calendar ;)
 
+NOTE: Move to publish profile once we stop the deploy/destroy frequently
+
 == Terraform
 
 === Installation
@@ -51,36 +52,55 @@ WARNING: Account is valid for one year, so add an update to your calendar ;)
 === Usage
 
 [source,cmd]
+.Azure
 ----
+# Login into Azure
 az login
 
+# Set your default subscription
+az account list --output table
+az account set --subscription "subscription-id"
+az account show --output table
+----
+
+[source,cmd]
+.Terraform
+----
+# Initialize Terraform
 terraform init
+
+# Optional steps to use workspaces
 terraform workspace new poc
 terraform workspace select poc
 
+# Check / Deploy
 terraform plan
 terraform apply
 
+# Destroy all
 terraform plan -destroy
 terraform destroy
 
+# Format code
 terraform fmt -recursive
 ----
 
 NOTE: You can specify a specific config file using `terraform plan -var-file="./configuration/wps.poc.tfvars"`
 
-=== Deployment manual
+== Build & Deploy
 
-* Instance count on App Services : https://github.com/terraform-providers/terraform-provider-azurerm/issues/7502
-* Load balancing delay on App Service Health Check
+[source,cmd]
+----
+Start Docker Daemon
+
+# Identification lasts only 1 hour
+az acr login -n beenotice
+mvnw compile jib:build
+----
 
 == Annexes
 
-=== Sizing
-
-* Sur la plan App Service doit être au moins en Standard pour avoir accès au déploiement continu
-
-=== Ressources
+=== Resources
 
 * https://github.com/terraform-providers/terraform-provider-azurerm/tree/master/examples
 
@@ -93,4 +113,52 @@ az account list-locations -o table
 
 # List App Services runtimes
 az webapp list-runtimes --linux
+----
+
+https://hub.docker.com/_/microsoft-java-jre
+
+
+== TODO
+
+* Add tags on created elements (Terrafom: true)
+
+== Demo
+
+[source,cmd]
+----
+# Tools / Environment
+Start Docker Daemon
+
+# Deploy Azure infrastructure
+terraform plan
+terraform apply
+
+# Build and deploy App
+az acr login -n beenotice
+mvnw compile jib:build
+
+# Local run
+az acr repository show-tags --name beenotice --repository hello-prod --output table
+docker pull beenotice.azurecr.io/hello-prod:latest
+docker images
+docker run --name hello-prod -e "SPRING_PROFILES_ACTIVE=local,prod" -p 8080:8080 -d beenotice.azurecr.io/hello-prod:latest
+docker ps -a
+docker stop hello-prod
+docker rm hello-prod
+
+# Deploy to AKS
+az aks get-credentials --resource-group=rg-hello-dev --name=aks-hello-dev
+
+
+
+kubectl run hello-prod --image=beenotice.azurecr.io/hello-prod:latest
+kubectl expose pod hello-prod --type=LoadBalancer --port=80 --target-port=8080
+
+# Access application
+kubectl get all
+kubectl get services -o=jsonpath='{.items[*].status.loadBalancer.ingress[0].ip}'
+kubectl logs hello-prod
+
+# Performance
+gatling run
 ----
