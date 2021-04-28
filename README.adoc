@@ -8,12 +8,16 @@
 :toc-title: Sommaire
 :description: Hello Prod
 
-== Azure cli
+== Tools
+
+=== Azure cli
 
 * https://docs.microsoft.com/fr-fr/cli/azure/install-azure-cli-windows?tabs=azure-cli
 * https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/guides/azure_cli
 
 Perform installation _(requires Administrator rights)_
+
+=== kubectl
 
 [source,cmd]
 .kubectl
@@ -21,27 +25,9 @@ Perform installation _(requires Administrator rights)_
 az aks install-cli
 ----
 
-== Deployment initialisation
+=== Terraform
 
-=== Create a Service Principal for GitHub deployment
-
-* https://docs.microsoft.com/fr-fr/cli/azure/create-an-azure-service-principal-azure-cli
-
-[source,cmd]
-----
-# Select the appropriate subscription
-az ad sp create-for-rbac --name "GitHub" --role contributor --sdk-auth
-----
-
-WARNING: By default, az ad sp create-for-rbac assigns the Contributor role to the service principal at the subscription scope.
-
-WARNING: Account is valid for one year, so add an update to your calendar ;)
-
-NOTE: Move to publish profile once we stop the deploy/destroy frequently
-
-== Terraform
-
-=== Installation
+==== Installation
 
 * https://www.terraform.io/downloads.html
 * Unzip & Add to path
@@ -49,7 +35,7 @@ NOTE: Move to publish profile once we stop the deploy/destroy frequently
 	** Add to "Path"
 * Check by typing terraform in a Powershell console
 
-=== Usage
+==== Usage
 
 [source,cmd]
 .Azure
@@ -87,41 +73,6 @@ terraform fmt -recursive
 
 NOTE: You can specify a specific config file using `terraform plan -var-file="./configuration/wps.poc.tfvars"`
 
-== Build & Deploy
-
-[source,cmd]
-----
-Start Docker Daemon
-
-# Identification lasts only 1 hour
-az acr login -n beenotice
-mvnw compile jib:build
-----
-
-== Annexes
-
-=== Resources
-
-* https://github.com/terraform-providers/terraform-provider-azurerm/tree/master/examples
-
-=== Azure data
-
-[source,cmd]
-----
-# List locations
-az account list-locations -o table
-
-# List App Services runtimes
-az webapp list-runtimes --linux
-----
-
-https://hub.docker.com/_/microsoft-java-jre
-
-
-== TODO
-
-* Add tags on created elements (Terrafom: true)
-
 == Demo
 
 [source,cmd]
@@ -136,29 +87,70 @@ terraform apply
 # Build and deploy App
 az acr login -n beenotice
 mvnw compile jib:build
-
-# Local run
 az acr repository show-tags --name beenotice --repository hello-prod --output table
+
+# Retrieve image for Local Docker
 docker pull beenotice.azurecr.io/hello-prod:latest
 docker images
+
+# Local run
 docker run --name hello-prod -e "SPRING_PROFILES_ACTIVE=local,prod" -p 8080:8080 -d beenotice.azurecr.io/hello-prod:latest
 docker ps -a
+docker logs afc531234275
 docker stop hello-prod
 docker rm hello-prod
 
 # Deploy to AKS
 az aks get-credentials --resource-group=rg-hello-dev --name=aks-hello-dev
+kubectl apply -f C:/Dev/workspace/hello-prod/deployment.yml 
 
-
-
-kubectl run hello-prod --image=beenotice.azurecr.io/hello-prod:latest
-kubectl expose pod hello-prod --type=LoadBalancer --port=80 --target-port=8080
-
-# Access application
+# Check deployment
 kubectl get all
 kubectl get services -o=jsonpath='{.items[*].status.loadBalancer.ingress[0].ip}'
-kubectl logs hello-prod
+kubectl logs pod/hello-prod-XXXX
 
-# Performance
-gatling run
+# Launch running tests (Check Azure Monitoring)
+./performance/run-rest-simulation.cmd
+
+# Scale out
+kubectl scale --replicas=2 deployment/hello-prod
+
+# Update version (update mvn version, build & deploy to repository)
+kubectl set image deployment hello-prod hello-prod=beenotice.azurecr.io/hello-prod:0.0.2-SNAPSHOT
+
+# Shutdown pods
+kubectl describe pod
+
+# Destroy pods
+kubectl delete -f C:/Dev/workspace/hello-prod/deployment.yml
 ----
+
+
+== Annexes
+
+=== Resources
+
+* https://github.com/terraform-providers/terraform-provider-azurerm/tree/master/examples
+* https://docs.microsoft.com/fr-fr/azure/developer/java/migration/migrate-spring-boot-to-azure-kubernetes-service
+* https://docs.microsoft.com/fr-fr/azure/aks/tutorial-kubernetes-prepare-app
+* https://docs.microsoft.com/fr-fr/learn/modules/build-and-store-container-images/
+* https://github.com/Azure-Samples/java-on-aks
+* https://docs.microsoft.com/fr-fr/azure/developer/java/spring-framework/deploy-spring-boot-java-app-on-kubernetes
+
+=== Azure data
+
+[source,cmd]
+----
+# List locations
+az account list-locations -o table
+
+# List App Services runtimes
+az webapp list-runtimes --linux
+
+# Docker images
+https://hub.docker.com/_/microsoft-java-jre
+----
+
+== TODO
+
+* Add tags on created elements (Terrafom: true)
