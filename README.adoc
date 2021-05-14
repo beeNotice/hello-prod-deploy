@@ -17,6 +17,12 @@
 
 Perform installation _(requires Administrator rights)_
 
+=== Gatling
+
+* https://repo1.maven.org/maven2/io/gatling/highcharts/gatling-charts-highcharts-bundle/3.5.1/gatling-charts-highcharts-bundle-3.5.1-bundle.zip
+
+Perform configuration in `performance/run-rest-simulation.cmd`
+
 === kubectl
 
 [source,cmd]
@@ -73,7 +79,26 @@ terraform fmt -recursive
 
 NOTE: You can specify a specific config file using `terraform plan -var-file="./configuration/wps.poc.tfvars"`
 
-== Demo
+== Deployment
+
+=== App Service
+
+[source,cmd]
+----
+mvn package azure-webapp:deploy
+----
+
+=== Azure Registry
+
+[source,cmd]
+----
+# Build and deploy App
+az acr login -n beenotice
+mvnw compile jib:build
+az acr repository show-tags --name beenotice --repository hello-prod --output table
+----
+
+== Demo AKS
 
 [source,cmd]
 ----
@@ -126,9 +151,49 @@ kubectl delete -f C:/Dev/workspace/hello-prod/deployment.yml
 ----
 
 
+== Demo App Service
+
+[source,cmd]
+----
+# Deploy Azure infrastructure
+terraform plan
+terraform apply
+
+# Check
+https://azapp-hello-app-dev.azurewebsites.net/actuator/info
+https://azapp-hello-app-dev-staging.azurewebsites.net/actuator/info
+
+# Configure settings (fill App Insight informations in `app-settings/prod.json`) 
+az webapp config appsettings set -g rg-hello-dev -n azapp-hello-app-dev --settings @app-settings/prod.json
+az webapp config appsettings set -g rg-hello-dev -n azapp-hello-app-dev --slot staging --settings @app-settings/staging.json
+
+
+# Build and deploy App (on staging)
+mvn package azure-webapp:deploy
+https://azapp-hello-app-dev-staging.azurewebsites.net/actuator/info
+
+# Run performance
+./performance/run-rest-simulation.cmd
+
+# Switch
+az webapp deployment slot swap  -g rg-hello-dev -n azapp-hello-app-dev --slot staging --target-slot production
+
+# Inc version and deploy new version + configuration _(actual configuration is the N-1)_
+
+
+----
+
+
 == Annexes
 
 === Resources
+
+==== App Service
+
+* https://docs.microsoft.com/en-us/azure/app-service/deploy-staging-slots
+* https://docs.microsoft.com/en-us/azure/azure-monitor/app/azure-web-apps?tabs=net#automate-monitoring
+
+==== AKS
 
 * https://github.com/terraform-providers/terraform-provider-azurerm/tree/master/examples
 * https://docs.microsoft.com/fr-fr/azure/developer/java/migration/migrate-spring-boot-to-azure-kubernetes-service
@@ -136,6 +201,8 @@ kubectl delete -f C:/Dev/workspace/hello-prod/deployment.yml
 * https://docs.microsoft.com/fr-fr/learn/modules/build-and-store-container-images/
 * https://github.com/Azure-Samples/java-on-aks
 * https://docs.microsoft.com/fr-fr/azure/developer/java/spring-framework/deploy-spring-boot-java-app-on-kubernetes
+
+
 
 === Azure data
 

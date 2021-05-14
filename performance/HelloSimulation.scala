@@ -11,7 +11,9 @@ class HelloSimulation extends Simulation {
   
   val httpProtocol = http
     //.baseUrl("http://localhost:8080")
-    .baseUrl("http://20.74.8.160")
+    //.baseUrl("http://20.74.8.160")
+    .baseUrl("https://azapp-hello-app-dev.azurewebsites.net/")
+    //.baseUrl("https://azapp-hello-app-dev-staging.azurewebsites.net/")
 
   // A scenario is a chain of requests and pauses
   val scn = scenario("Main scenario")
@@ -23,6 +25,6 @@ class HelloSimulation extends Simulation {
     )
 
   // https://gatling.io/docs/current/general/simulation_setup/  
-  //setUp(scn.inject(rampUsers(60).during(30.seconds)).protocols(httpProtocol))
-  setUp(scn.inject(rampUsers(120).during(60.seconds)).protocols(httpProtocol))
+  //setUp(scn.inject(rampUsers(120).during(30.seconds)).protocols(httpProtocol))
+  setUp(scn.inject(rampUsers(1200).during(600.seconds)).protocols(httpProtocol))
 }

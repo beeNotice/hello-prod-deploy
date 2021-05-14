@@ -1,0 +1,22 @@
+[
+    {
+        "name": "SPRING_PROFILES_ACTIVE",
+        "value": "staging",
+        "slotSetting": true
+    },
+    {
+        "name": "INFO_APP_STAGING",
+        "value": "This is the staging slot!",
+        "slotSetting": true
+    },
+    {
+        "name": "INFO_APP_NEW",
+        "value": "This is a N+1 parameter",
+        "slotSetting": false
+    },
+    {
+        "name": "WEBSITES_ENABLE_APP_SERVICE_STORAGE",
+        "value": "false",
+        "slotSetting": true
+    }
+]

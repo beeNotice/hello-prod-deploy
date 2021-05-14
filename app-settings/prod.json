@@ -1,0 +1,67 @@
+[
+    {
+        "name": "SPRING_PROFILES_ACTIVE",
+        "value": "prod",
+        "slotSetting": true
+    },
+    {
+        "name": "WEBSITES_ENABLE_APP_SERVICE_STORAGE",
+        "value": "false",
+        "slotSetting": true
+    },
+    {
+        "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+        "value": "d6c08934-4125-4d65-96cc-680dbf461e9b",
+        "slotSetting": true
+    },
+    {
+        "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+        "value": "InstrumentationKey=d6c08934-4125-4d65-96cc-680dbf461e9b;IngestionEndpoint=https://francecentral-0.in.applicationinsights.azure.com/",
+        "slotSetting": true
+    },
+    {
+        "name": "APPINSIGHTS_PROFILERFEATURE_VERSION",
+        "value": "1.0.0",
+        "slotSetting": true
+    },
+    {
+        "name": "APPINSIGHTS_SNAPSHOTFEATURE_VERSION",
+        "value": "1.0.0",
+        "slotSetting": true
+    },
+    {
+        "name": "ApplicationInsightsAgent_EXTENSION_VERSION",
+        "value": "~3",
+        "slotSetting": true
+    },
+    {
+        "name": "DiagnosticServices_EXTENSION_VERSION",
+        "value": "~3",
+        "slotSetting": true
+    },
+    {
+        "name": "InstrumentationEngine_EXTENSION_VERSION",
+        "value": "disabled",
+        "slotSetting": true
+    },
+    {
+        "name": "SnapshotDebugger_EXTENSION_VERSION",
+        "value": "disabled",
+        "slotSetting": true
+    },
+    {
+        "name": "XDT_MicrosoftApplicationInsights_BaseExtensions",
+        "value": "disabled",
+        "slotSetting": true
+    },
+    {
+        "name": "XDT_MicrosoftApplicationInsights_Mode",
+        "value": "recommended",
+        "slotSetting": true
+    },
+    {
+        "name": "XDT_MicrosoftApplicationInsights_PreemptSdk",
+        "value": "disabled",
+        "slotSetting": true
+    }
+]

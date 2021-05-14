@@ -1,5 +1,5 @@
 ##############################################
-#           Application Insights             #
+#                Workspace                  #
 ##############################################
 resource "random_id" "workspace" {
   byte_length = 8
@@ -15,7 +15,7 @@ resource "azurerm_log_analytics_workspace" "hello" {
 ##############################################
 #             AKS supervision                #
 ##############################################
-resource "azurerm_log_analytics_solution" "example" {
+resource "azurerm_log_analytics_solution" "container" {
   solution_name         = "ContainerInsights"
   resource_group_name   = var.resource_group_name
   location              = var.location
@@ -27,6 +27,10 @@ resource "azurerm_log_analytics_solution" "example" {
     product   = "OMSGallery/ContainerInsights"
   }
 }
+
+##############################################
+#           Application Insights             #
+##############################################
 resource "azurerm_application_insights" "hello" {
   name                = "appinsights-${var.prefix}-hello-${var.env}"
   resource_group_name = var.resource_group_name
