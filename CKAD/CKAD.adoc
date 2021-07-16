@@ -1,0 +1,25 @@
+== Questions
+
+* https://github.com/dgkanatsios/CKAD-exercises
+
+[source,cmd]
+----
+alias k='kubectl'
+az aks get-credentials --resource-group=rg-hello-dev --name=aks-hello-dev
+----
+
+[source,cmd]
+----
+
+k create namespace mynamespace
+k run nginx --image=nginx -n mynamespace
+
+k run nginx --image=nginx -n mynamespace -o yaml --dry-run=client > nginx.yaml
+k apply-f nginx.yaml
+
+k run busybox --image=busybox --dry-run=client -o yaml --restart=Never --command -- env > busy.yaml
+k logs busybox
+----
+
+
+https://github.com/dgkanatsios/CKAD-exercises/blob/master/a.core_concepts.md#get-the-yaml-for-a-new-namespace-called-myns-without-creating-it

@@ -180,9 +180,7 @@ az webapp deployment slot swap  -g rg-hello-dev -n azapp-hello-app-dev --slot st
 
 # Inc version and deploy new version + configuration _(actual configuration is the N-1)_
 
-
 ----
-
 
 == Annexes
 

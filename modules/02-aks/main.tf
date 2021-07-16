@@ -1,12 +1,14 @@
 ##############################################
 #         Container registry                 #
 ##############################################
+/*
 resource "azurerm_container_registry" "bee" {
   name                = "beenotice"
   resource_group_name = var.resource_group_name
   location            = var.location
   sku                 = "Standard"
 }
+*/
 
 ##############################################
 #        Azure Kubernetes Service            #
@@ -47,8 +49,10 @@ resource "azurerm_kubernetes_cluster" "hello" {
 #                 Roles                      #
 ##############################################
 # Autorization to pull images from repository
+/*
 resource "azurerm_role_assignment" "hello_to_acr" {
   scope                = azurerm_container_registry.bee.id
   role_definition_name = "AcrPull"
   principal_id         = azurerm_kubernetes_cluster.hello.kubelet_identity[0].object_id
 }
+*/
